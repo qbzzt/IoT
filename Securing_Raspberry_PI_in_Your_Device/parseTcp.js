@@ -34,6 +34,15 @@ fs.readFile("dns", function(err, data) {
 });
 
 
+// Log the fact that we connected to this port on this hostname
+var logAccess = function(name, port) {
+	// 
+	if (!clientAccess[port])
+		clientAccess[port] = {};
+
+	clientAccess[port][name] = true;
+};
+
 
 
 var readTcpFile = function() {
@@ -50,7 +59,9 @@ var readTcpFile = function() {
 			// use the IP itself
 			var name = dns[ip] ? dns[ip].slice(0,-1) : ip;	
 
-			log_access(name, port);
+			logAccess(name, port);
 		}
+
+		console.log(JSON.stringify(clientAccess));
 	});
 };
