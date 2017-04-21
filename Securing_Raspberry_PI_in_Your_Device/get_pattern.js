@@ -11,8 +11,6 @@ var pollingFreq = 1;
 // Time for a full cycle of the device, in seconds. This means that
 // anything that happens to this device, we expect to happen at least
 // once during that time.
-//
-// Note that this script actually takes twice that amount of time.
 var cycleLength = 60;
 
 
@@ -62,13 +60,13 @@ setTimeout(function() {
 
 
 
-var startTcpdump = function(filter, time, callback) {
+var startTcpdump = function(filter, time, callback, outOnly) {
 	var output = "";
 	var process = child_process.spawn("sudo",
-		["tcpdump", "--direction=out", "-n", "-l", filter]);
+		["tcpdump", outOnly ? "--direction=out" : "-f", "-n", "-l", filter]);
 
 	process.stdout.on("data", function(data) {
-		output += data;
+		output += data.toString();
 	});
 
 	// Show stderr
@@ -88,30 +86,100 @@ var startTcpdump = function(filter, time, callback) {
 		child_process.spawn("sudo", ["kill", process.pid]);
 
 		callback(output);
-
-	}, time*1000);
+	}, time);
 };
 
-var dns = "";
+
+// The output of tcpdump
+
+// As strings
+var dnsString = "";
 var tcpAsClient = "";
 var udpPackets = "";
+
+
+// As actual values, after parsing
+var dnsRequests = {};
+var dns = {};
+var tcpClients = {};
+var udpClients = {};
+
 
 startTcpdump(
 	"tcp[tcpflags] & tcp-syn != 0 " + 
 	"and tcp[tcpflags] & tcp-ack == 0 and tcp", 
-	cycleLength*1000, 
-	function(output) { tcpAsClient = output; }
+	cycleLength*1000,
+	function(output) { tcpAsClient = output; },
+	true
 );
 
 
 startTcpdump(
 	"port 53",
 	cycleLength*1000, 
-	function(output) { dns = output; }
+	function(output) { dnsString = output; },
+	false
 );
+
 
 startTcpdump(
 	"udp",
 	cycleLength*1000, 
-	function(output) { udpPackets = output; }
+	function(output) { udpPackets = output; },
+	true
 );
+
+
+// Parse the result of the tcpdump commands once all the results are in
+var parseDumps = function() {
+	// If there are no results yet, 
+	if (dnsString == "" || tcpAsClient == "" || udpPackets == "") {
+		console.log("No output yet, waiting 10 seconds");
+		setTimeout(parseDumps, 10*1000);
+		return ;
+	}
+
+	parseDNS();
+	parseTCP();
+};
+
+
+
+// Parse DNS tcpdump
+var parseDNS = function() {
+	var lines = dnsString.split("\n");
+
+	for(var i=0; i<lines.length; i++) {
+		var words = lines[i].split(" ");
+
+                var reqNumber = words[5];
+
+                // Parsing the request number removes the
+                // + at the end of requests
+                if (reqNumber == parseInt(reqNumber)) {
+			for(var j=8; j<words.length; j+=2) {
+				// We only care about A records.      
+				//
+                	        // Some IPs end with a comma (whose that 
+        	                // aren't the last in the line) and some
+	                        // don't.
+				if (words[j-1] == "A") {
+	                        	var ip = words[j].split(",")[0];
+	                        	dns[ip] = dnsRequests[reqNumber];
+				}
+                        }
+                } else {
+                        dnsRequests[parseInt(reqNumber)] = words[7];
+                }
+        } 
+};
+
+
+// Parse TCP tcpdump
+var parseTCP = function() {
+
+};
+
+
+
+setTimeout(parseDumps, cycleLength*1000);
