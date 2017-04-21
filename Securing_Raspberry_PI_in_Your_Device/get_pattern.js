@@ -139,14 +139,17 @@ var parseDumps = function() {
 		return ;
 	}
 
-	parseDNS();
-	parseTCP();
+	parseDNS(dnsString);
+	parsePorts(tcpAsClient, tcpClients);
+	parsePorts(udpPackets, udpClients);
+	
+	console.log(JSON.stringify({tcp: tcpClients, udp: udpClients}));
 };
 
 
 
 // Parse DNS tcpdump
-var parseDNS = function() {
+var parseDNS = function(dnsString) {
 	var lines = dnsString.split("\n");
 
 	for(var i=0; i<lines.length; i++) {
@@ -175,19 +178,10 @@ var parseDNS = function() {
 };
 
 
-// Log the fact that we connected to this port on this hostname
-var logAccess = function(name, port) {
-	// 
-	if (!tcpClients[port])
-		tcpClients[port] = {};
 
-	tcpClients[port][name] = true;
-};
-
-
-// Parse TCP tcpdump
-var parseTCP = function() {
-	var lines = tcpAsClient.split("\n");
+// Parse either TCP or UDP tcpdump
+var parsePorts = function(tcpdumpOutput, table) {
+	var lines = tcpdumpOutput.split("\n");
 
 	for(var i=0; i<lines.length; i++) {
 		var words = lines[i].split(/:? /);
@@ -205,12 +199,13 @@ var parseTCP = function() {
 		// use the IP itself
 		var name = dns[ip] ? dns[ip].slice(0,-1) : ip;	
 
-		logAccess(name, port);
+		if (!table[port])
+			table[port] = {};
+
+		table[port][name] = true;
 	}
 	
-	console.log(JSON.stringify(tcpClients));
 };
-
 
 
 setTimeout(parseDumps, cycleLength*1000);
