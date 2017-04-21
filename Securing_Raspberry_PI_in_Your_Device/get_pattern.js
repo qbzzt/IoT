@@ -1,7 +1,7 @@
 var ps = require("ps-man");
 var netstat = require("node-netstat");
 var child_process = require("child_process");
-
+var fs = require("fs");
 
 
 // Polling frequency, in seconds. This is how often we look at the
@@ -9,16 +9,29 @@ var child_process = require("child_process");
 var pollingFreq = 1;
 
 // Time for a full cycle of the device, in seconds. This means that
-// anything that happens to this device, we expect to happen at least
+// anything that happens on this device, we expect to happen at least
 // once during that time.
 var cycleLength = 60;
 
 
 
 
-// Variables to gather process and socket information over a full cycle
+// Variables to gather information over a full cycle
+
+// These are filled by polling
 var processHistory = {};
 var listenSockets = {};
+
+// These are filled by running tcpdump commands and parsing the output
+var dns = {};
+var tcpClients = {};
+var udpClients = {};
+
+
+// Semaphores to signal that the information is available for reporting
+var pollingDone = false;
+var parsingDone = false;
+
 
 
 var getProcesses = function() {
@@ -48,6 +61,8 @@ var socketInterval = setInterval(getSockets, pollingFreq *1000);
 var endPolling = function() {
 	clearInterval(processInterval);
 	clearInterval(socketInterval);
+
+	pollingDone = true;
 };
 
 // Set up end of polling. Note that polling runs for two full cycles
@@ -71,7 +86,8 @@ var startTcpdump = function(filter, time, callback, outOnly) {
 
 	// Show stderr
 	process.stderr.on("data", function(data) {
-		console.log("stderr on tcpdump:" + data);
+		console.log("stderr on tcpdump (" + filter + ") :" 
+			+ data);
 	});
 
 	// Display errors
@@ -90,19 +106,14 @@ var startTcpdump = function(filter, time, callback, outOnly) {
 };
 
 
-// The output of tcpdump
-
-// As strings
+// The output of tcpdump as strings
 var dnsString = "";
 var tcpAsClient = "";
 var udpPackets = "";
 
 
-// As actual values, after parsing
+
 var dnsRequests = {};
-var dns = {};
-var tcpClients = {};
-var udpClients = {};
 
 
 startTcpdump(
@@ -142,11 +153,17 @@ var whenDo = function(when, todo) {
 // This is a separate function because we need the DNS results before we can
 // parse the TCP or UDP.
 var parseDumps = function() {
-	whenDo(function() { return dnsString != "" && tcpAsClient != "" && udpPackets != ""; },
+	whenDo(function() { 
+			return dnsString != "" && 
+				tcpAsClient != "" && 
+				udpPackets != ""; 
+		},
 	     	function() {
 			parseDNS(dnsString);
 			parsePorts(tcpAsClient, tcpClients);
 			parsePorts(udpPackets, udpClients);
+
+			parsingDone = true;
 		}
 	);
 };
@@ -214,3 +231,22 @@ var parsePorts = function(tcpdumpOutput, table) {
 
 
 setTimeout(parseDumps, cycleLength*1000);
+
+
+
+var saveResults = function() 	{
+	whenDo(function() {
+		return pollingDone && parsingDone;
+	}, function() {
+		var result = {
+			processes: processHistory,
+			listen: listenSockets,
+			tcp: tcpClients,
+			udp: udpClients
+		};
+		fs.writeFile("behaviorPattern.json", 
+			JSON.stringify(result) + "\n");
+	}); 
+};
+
+setTimeout(saveResults, cycleLength*1000);
