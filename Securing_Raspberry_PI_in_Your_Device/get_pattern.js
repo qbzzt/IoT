@@ -175,9 +175,35 @@ var parseDNS = function() {
 };
 
 
+// Log the fact that we connected to this port on this hostname
+var logAccess = function(name, port) {
+	// 
+	if (!tcpClients[port])
+		tcpClients[port] = {};
+
+	tcpClients[port][name] = true;
+};
+
+
 // Parse TCP tcpdump
 var parseTCP = function() {
+	var lines = tcpAsClient().split("\n");
 
+	for(var i=0; i<lines.length; i++) {
+		var words = lines[i].split(/:? /);
+		var nums = words[4].split(".");
+		var ip = nums[0]+"."+nums[1]+"."+nums[2]+"."+nums[3];
+		var port = nums[4];
+		
+		// If there is a DNS entry for the IP address, use
+		// it (except for the trailing dot). If there isn't,
+		// use the IP itself
+		var name = dns[ip] ? dns[ip].slice(0,-1) : ip;	
+
+		logAccess(name, port);
+	}
+	
+	console.log(JSON.stringify(tcpClients));
 };
 
 
