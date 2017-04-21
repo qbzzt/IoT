@@ -187,10 +187,15 @@ var logAccess = function(name, port) {
 
 // Parse TCP tcpdump
 var parseTCP = function() {
-	var lines = tcpAsClient().split("\n");
+	var lines = tcpAsClient.split("\n");
 
 	for(var i=0; i<lines.length; i++) {
 		var words = lines[i].split(/:? /);
+
+		// Ignore empty lines
+		if (words.length < 5) 
+			continue;
+
 		var nums = words[4].split(".");
 		var ip = nums[0]+"."+nums[1]+"."+nums[2]+"."+nums[3];
 		var port = nums[4];
