@@ -130,7 +130,9 @@ startTcpdump(
 );
 
 
-// Parse the result of the tcpdump commands once all the results are in
+// Parse the result of the tcpdump commands once all the results are in.
+// This is a separate function because we need the DNS results before we can
+// parse the TCP or UDP.
 var parseDumps = function() {
 	// If there are no results yet, 
 	if (dnsString == "" || tcpAsClient == "" || udpPackets == "") {
@@ -142,8 +144,6 @@ var parseDumps = function() {
 	parseDNS(dnsString);
 	parsePorts(tcpAsClient, tcpClients);
 	parsePorts(udpPackets, udpClients);
-	
-	console.log(JSON.stringify({tcp: tcpClients, udp: udpClients}));
 };
 
 
