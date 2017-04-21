@@ -78,7 +78,7 @@ setTimeout(function() {
 var startTcpdump = function(filter, time, callback, outOnly) {
 	var output = "";
 	var process = child_process.spawn("sudo",
-		["tcpdump", outOnly ? "--direction=out" : "-f", "-n", "-l", filter]);
+		["tcpdump", "--direction" + (outOnly ? "out" : "inout"), "-n", "-l", filter]);
 
 	process.stdout.on("data", function(data) {
 		output += data.toString();
