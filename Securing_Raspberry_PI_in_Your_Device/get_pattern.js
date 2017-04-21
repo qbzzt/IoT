@@ -130,20 +130,25 @@ startTcpdump(
 );
 
 
+// If the first callback return true, do the second callback. Otherwise, wait five seconds and try again
+var whenDo = function(when, todo) {
+	if (when())
+		todo();
+	else
+		setTimeout(function() {whenDo(when, todo);}, 5000);
+};
+
 // Parse the result of the tcpdump commands once all the results are in.
 // This is a separate function because we need the DNS results before we can
 // parse the TCP or UDP.
 var parseDumps = function() {
-	// If there are no results yet, 
-	if (dnsString == "" || tcpAsClient == "" || udpPackets == "") {
-		console.log("No output yet, waiting 10 seconds");
-		setTimeout(parseDumps, 10*1000);
-		return ;
-	}
-
-	parseDNS(dnsString);
-	parsePorts(tcpAsClient, tcpClients);
-	parsePorts(udpPackets, udpClients);
+	whenDo(function() { return dnsString != "" && tcpAsClient != "" && udpPackets != ""; },
+	     	function() {
+			parseDNS(dnsString);
+			parsePorts(tcpAsClient, tcpClients);
+			parsePorts(udpPackets, udpClients);
+		}
+	);
 };
 
 
