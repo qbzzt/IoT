@@ -34,6 +34,13 @@ var parsingDone = false;
 
 
 
+// The output of tcpdump as strings
+var dnsString = "";
+var tcpAsClient = "";
+var udpPackets = "";
+
+
+// Polling functions
 var getProcesses = function() {
 	ps.list({}, function(err, result) {
 		for(var i=0; i<result.length; i++)
@@ -52,11 +59,6 @@ var getSockets = function() {
 };
 
 
-// Set up the polling
-var processInterval = setInterval(getProcesses, pollingFreq *1000);
-var socketInterval = setInterval(getSockets, pollingFreq *1000);
-
-
 // End polling
 var endPolling = function() {
 	clearInterval(processInterval);
@@ -65,13 +67,7 @@ var endPolling = function() {
 	pollingDone = true;
 };
 
-// Set up end of polling. Note that polling runs for two full cycles
-// Because during the first one we log TCP connections, during the 
-// second one we log UDP ones.
-setTimeout(function() {
-		endPolling();
-	}, 
-	cycleLength*1000);
+
 
 
 
@@ -106,41 +102,6 @@ var startTcpdump = function(filter, time, callback, outOnly) {
 };
 
 
-// The output of tcpdump as strings
-var dnsString = "";
-var tcpAsClient = "";
-var udpPackets = "";
-
-
-
-var dnsRequests = {};
-
-
-startTcpdump(
-	"tcp[tcpflags] & tcp-syn != 0 " + 
-	"and tcp[tcpflags] & tcp-ack == 0 and tcp", 
-	cycleLength*1000,
-	function(output) { tcpAsClient = output; },
-	true
-);
-
-
-startTcpdump(
-	"port 53",
-	cycleLength*1000, 
-	function(output) { dnsString = output; },
-	false
-);
-
-
-startTcpdump(
-	"udp",
-	cycleLength*1000, 
-	function(output) { udpPackets = output; },
-	true
-);
-
-
 // If the first callback return true, do the second callback. Otherwise, wait five seconds and try again
 var whenDo = function(when, todo) {
 	if (when())
@@ -149,30 +110,11 @@ var whenDo = function(when, todo) {
 		setTimeout(function() {whenDo(when, todo);}, 5000);
 };
 
-// Parse the result of the tcpdump commands once all the results are in.
-// This is a separate function because we need the DNS results before we can
-// parse the TCP or UDP.
-var parseDumps = function() {
-	whenDo(function() { 
-			return dnsString != "" && 
-				tcpAsClient != "" && 
-				udpPackets != ""; 
-		},
-	     	function() {
-			parseDNS(dnsString);
-			parsePorts(tcpAsClient, tcpClients);
-			parsePorts(udpPackets, udpClients);
-
-			parsingDone = true;
-		}
-	);
-};
-
-
 
 // Parse DNS tcpdump
 var parseDNS = function(dnsString) {
 	var lines = dnsString.split("\n");
+	var dnsRequests = {};	
 
 	for(var i=0; i<lines.length; i++) {
 		var words = lines[i].split(" ");
@@ -230,7 +172,24 @@ var parsePorts = function(tcpdumpOutput, table) {
 };
 
 
-setTimeout(parseDumps, cycleLength*1000);
+// Parse the result of the tcpdump commands once all the results are in.
+var parseDumps = function() {
+	whenDo(function() { 
+			return dnsString != "" && 
+				tcpAsClient != "" && 
+				udpPackets != ""; 
+		},
+	     	function() {
+			parseDNS(dnsString);
+			parsePorts(tcpAsClient, tcpClients);
+			parsePorts(udpPackets, udpClients);
+
+			parsingDone = true;
+		}
+	);
+};
+
+
 
 
 
@@ -249,4 +208,28 @@ var saveResults = function() 	{
 	}); 
 };
 
+
+// Processing done when the program starts
+
+// Set up the polling
+var processInterval = setInterval(getProcesses, pollingFreq *1000);
+var socketInterval = setInterval(getSockets, pollingFreq *1000);
+
+// Start tcpdump's
+startTcpdump("tcp[tcpflags] & tcp-syn != 0 and tcp[tcpflags] & tcp-ack == 0 and tcp", 
+	cycleLength*1000, function(output) { tcpAsClient = output; }, true);
+
+
+startTcpdump("port 53",
+	cycleLength*1000, function(output) { dnsString = output; }, false);
+
+
+startTcpdump("udp",
+	cycleLength*1000, function(output) { udpPackets = output; }, true);
+
+
+
+// Processing done after a cycle has passed
+setTimeout(endPolling, cycleLength*1000);
+setTimeout(parseDumps, cycleLength*1000);
 setTimeout(saveResults, cycleLength*1000);
