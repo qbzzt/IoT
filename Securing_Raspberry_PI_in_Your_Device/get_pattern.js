@@ -11,6 +11,8 @@ var pollingFreq = 1;
 // Time for a full cycle of the device, in seconds. This means that
 // anything that happens to this device, we expect to happen at least
 // once during that time.
+//
+// Note that this script actually takes twice that amount of time.
 var cycleLength = 60;
 
 
@@ -50,14 +52,13 @@ var endPolling = function() {
 	clearInterval(socketInterval);
 };
 
-// Set up end of polling
+// Set up end of polling. Note that polling runs for two full cycles
+// Because during the first one we log TCP connections, during the 
+// second one we log UDP ones.
 setTimeout(function() {
 		endPolling();
-		console.log(JSON.stringify({
-			processes: processHistory,
-			sockets: listenSockets		
-		}));
-	}, cycleLength*1000);
+	}, 
+	cycleLength*1000);
 
 
 
@@ -65,6 +66,7 @@ var startTcpdump = function(filter, time, callback) {
 	var output = "";
 	var process = child_process.spawn("sudo",
 		["tcpdump", "--direction=out", "-n", "-l", filter]);
+
 	process.stdout.on("data", function(data) {
 		output += data;
 	});
@@ -74,22 +76,42 @@ var startTcpdump = function(filter, time, callback) {
 		console.log("stderr on tcpdump:" + data);
 	});
 
-	// Ignore the error that results from killing the tcpdump
+	// Display errors
 	process.on("error",function(err) {
 		console.log("Error:" + err);
 	});
 
 	setTimeout(function() {
-		callback(output);
-
 		// We can't just use process.kill because it is a 
 		// root process and we don't have permissions. So
 		// instead we run sudo kill <pid>.
-		child_process.spawn("sudo", 
-			["kill", process.pid]);
+		child_process.spawn("sudo", ["kill", process.pid]);
+
+		callback(output);
+
 	}, time*1000);
 };
 
-startTcpdump("port 80", 10, function(output) {console.log(output)});
+var dns = "";
+var tcpAsClient = "";
+var udpPackets = "";
+
+startTcpdump(
+	"tcp[tcpflags] & tcp-syn != 0 " + 
+	"and tcp[tcpflags] & tcp-ack == 0 and tcp", 
+	cycleLength*1000, 
+	function(output) { tcpAsClient = output; }
+);
 
 
+startTcpdump(
+	"port 53",
+	cycleLength*1000, 
+	function(output) { dns = output; }
+);
+
+startTcpdump(
+	"udp",
+	cycleLength*1000, 
+	function(output) { udpPackets = output; }
+);
