@@ -1,9 +1,8 @@
 // Create the firewall rules to enforce a pattern detected by 
 // get_pattern.js and stored in behaviorPattern.json.
 
-// var ps = require("ps-man");
 var fs = require("fs");
-// var child_process = require("child_process");
+
 
 
 var behaviorPattern;
@@ -15,11 +14,12 @@ var fwRules =
 	"#\n" + 
 	"iptables -F INPUT\n" + 
 	"iptables -F OUTPUT\n\n" + 
-	"iptables -P INPUT DROP\n" +
+	"iptables -P INPUT ACCEPT\n" +
 	"iptables -P OUTPUT ACCEPT\n" + 
 	"iptables -A INPUT -i lo -j ACCEPT\n" +
-	"iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT\n"; 
-
+	"iptables -A OUTPUT -o lo -j ACCEPT\n" +
+	"iptables -A INPUT -m state --state ESTABLISHED,RELATED -j ACCEPT\n" +
+	"iptables -A OUTPUT -m state --state ESTABLISHED,RELATED -j ACCEPT\n\n"; 
 
 
 
@@ -27,6 +27,9 @@ fs.readFile("behaviorPattern.json", function(err, data) {
 	behaviorPattern = JSON.parse(data);
 
 	processListenPorts(behaviorPattern.listen);
+	processTCP(behaviorPattern.tcp);
+
+	fs.writeFile("fwCommands.sh", fwRules);
 });
 
 
@@ -57,7 +60,27 @@ var processListenPorts = function(listenPorts) {
 				"--state NEW -m tcp --dport " +
 				tcpPorts[j]  +" -j ACCEPT\n"
 
-	fwRules += "iptables -A INPUT -j DROP\n\n";
+	fwRules += "iptables -A INPUT -p tcp -j REJECT\n";
+	fwRules += "iptables -A INPUT -j ACCEPT\n\n";
+};
 
-	console.log(fwRules);
+
+var processTCP = function(tcp) {
+	// The port numbers
+	var ports = Object.keys(tcp);
+
+	for(var i=0; i<ports.length; i++) {
+		var hosts = Object.keys(tcp[ports[i]]);
+		for(var j=0; j<hosts.length; j++)
+			fwRules += 
+			"iptables -A OUTPUT -p tcp -m state " + 
+				"--state NEW -m tcp --dport " +
+				ports[i] + " -d " + hosts[j] +
+				" -j ACCEPT\n"
+
+	}
+
+	fwRules += "iptables -A OUTPUT -p tcp -j DROP\n";
+	fwRules += "iptables -A OUTPUT -j ACCEPT\n\n";
+
 };
