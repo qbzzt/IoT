@@ -48,9 +48,10 @@ var enforceProcesses = function(processes) {
 		for(var i=0; i<result.length; i++) {
 			if (!processes[result[i].command] &&
 				!allowable(result[i]) ) {
-				child_process.spawn("sudo",
+				killer = child_process.spawn("sudo",
 					["kill", "-9", result[i].pid]);
-				console.log("Killed " + result[i].command);
+				console.log("Killed " + result[i].command +
+					" using PID:" + killer.pid);
 			}
 		}
 	});
