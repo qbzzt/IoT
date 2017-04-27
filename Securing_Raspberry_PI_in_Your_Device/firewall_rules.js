@@ -80,7 +80,7 @@ var processTCP = function(tcp) {
 
 	}
 
-	fwRules += "iptables -A OUTPUT -p tcp -j DROP\n";
+	fwRules += "iptables -A OUTPUT -p tcp -j REJECT\n";
 	fwRules += "iptables -A OUTPUT -j ACCEPT\n\n";
 
 };
