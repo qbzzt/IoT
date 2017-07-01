@@ -1,0 +1,21 @@
+{
+  "wifi": {
+    "sta": {
+      "enable": false 
+    }, 
+    "ap": {
+      "enable": true, 
+      "ssid": "Smartlock", 
+      "pass": "", 
+      "hidden": false, 
+      "channel": 6, 
+      "max_connections": 1, 
+      "ip": "10.255.255.1", 
+      "netmask": "255.255.255.0", 
+      "dhcp_start": "10.255.255.2", 
+      "dhcp_end": "10.255.255.50", 
+      "keep_enabled": true, 
+      "trigger_on_gpio": -1
+    }
+  }
+}
