@@ -6,7 +6,7 @@ GPIO.set_mode(D[1], GPIO.MODE_INPUT);
 
 GPIO.set_int_handler(D[1], GPIO.INT_EDGE_ANY, 
   function() {print("D1 is now ", GPIO.read(D[1]));}, 
-  {});
+  null);
 
 
 
