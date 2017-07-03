@@ -1,5 +1,5 @@
 pin = 2
-pinVal = 0
+pinVal = 1
 gpio.mode(pin, gpio.OUTPUT)
 
 counter = 0
