@@ -1,9 +1,8 @@
-wifi.setmode(wifi.SOFTAP, false)
+wifi.setmode(wifi.SOFTAP)
 
 
 result = wifi.ap.config({
-    ssid="Smartlock",
-    save=false
+    ssid="Smartlock"
 })
 
 if (result == false) then print("wifi.ap.config failed") end
