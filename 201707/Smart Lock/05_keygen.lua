@@ -6,5 +6,7 @@ for i=0,5 do
    print ("Key #" .. i .. " is " .. key)
 end
 
-storeMe = key
+storeMe = crypto.toBase64(crypto.hash("sha1", key))
+
+print ("Store this value: " .. storeMe)
 
