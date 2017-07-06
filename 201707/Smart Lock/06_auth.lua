@@ -1,8 +1,8 @@
 
 function auth(newKey) do 
-  fd = file.open("authkey", "r"); local oldKey = fd:read(); fd:close()
+  fd = file.open("authkey", "r"); oldKey = fd:read(); fd:close()
 
-  fd = file.open("keynum", "r"); local keyNum = fd:read(); fd:close()
+  fd = file.open("keynum", "r"); keyNum = fd:read(); fd:close()
 
   if oldKey == crypto.toBase64(crypto.hash("sha1", newKey)) then
     -- Authentication successful
