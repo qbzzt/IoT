@@ -52,7 +52,21 @@ function httpResponse(path)
 
   -- If there is no authorization code, return the form
   if authCode == nil then
-    return "<h1>Confused</h1>"
+    local keyNum
+
+    fd = file.open("keynum", "r"); keyNum = fd:read(); fd:close()
+    return [[
+    <html>
+    <body>
+    <form action="/on" type="get">
+    Authorization key # ]] .. keyNum ..
+    [[: <input name="key" type="text">
+    <br />
+    <button type="Submit">Submit</button>
+    </form>
+    </body>
+    </html>    
+    ]]
   end
   
   if auth(authCode) then
@@ -62,12 +76,14 @@ function httpResponse(path)
     timer:register(10*1000, tmr.ALARM_SINGLE,   -- it will unregister automatically 
         function (t) gpio.write(pin, 0) end)
     timer:start()    
-    return "<h1>Lock opened for ten seconds</h1>"
+    return [[<html><body><h1>
+             Lock opened for ten seconds
+             </h1></body></html>]]
   end
 
   -- If we got here, it means that the authorization
   -- key exists, but is incorrect
-  return "<h1>Bad authorization key</h1>"
+  return "<html><body><h1>Wrong key</h1></body></html>"
   
 end
 
