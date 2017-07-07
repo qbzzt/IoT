@@ -36,7 +36,7 @@ function httpResponse(path)
     return "<h1>Lock opened for ten seconds</h1>"
   end
 
-  return "Confused"
+  return "<1>Confused<1>"
 end
 
 httpServer = net.createServer(net.TCP)
