@@ -49,12 +49,16 @@ function httpResponse(path)
   authCode = string.match(path, "/on%?key=(%S+)")
 
   print (authCode)
+
+  -- If there is no authorization code, return the form
+  if authCode == nil then
+    return "<h1>Confused</h1>"
+  end
   
   if auth(authCode) then
     local timer
     gpio.write(pin, 1)
     timer = tmr.create()
-
     timer:register(10*1000, tmr.ALARM_SINGLE,   -- it will unregister automatically 
         function (t) gpio.write(pin, 0) end)
     timer:start()    
@@ -63,13 +67,8 @@ function httpResponse(path)
 
   -- If we got here, it means that the authorization
   -- key exists, but is incorrect
-  if authCode then
-    return "<h1>Bad authorization key</h1>"
-  end
-
-  -- If we got here, there is no authorization key.
-  -- return the form
-  return "<h1>Confused</h1>"
+  return "<h1>Bad authorization key</h1>"
+  
 end
 
 httpServer = net.createServer(net.TCP)
