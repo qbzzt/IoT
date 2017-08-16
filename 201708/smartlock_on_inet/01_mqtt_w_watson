@@ -1,0 +1,100 @@
+gpio.mode(2, gpio.OUTPUT)
+gpio.write(2, 0)
+
+wifiOff = true
+
+if (wifiOff) then
+    wifi.setmode(wifi.STATION)
+    wifi.sta.config({
+        ssid = "pomeranch",
+        pwd = "<<redacted>>"
+    })
+    print(wifi.sta.getip())
+ 
+    wifiOff = false
+end
+
+
+
+mqttContact = {            
+            -- Values that come from IBM
+            orgID = "t2or63",                  
+            authToken = "15F1-zt?309jVNQwLj",  
+
+            -- Boilerplate values
+            devType = "NodeMCU-SmartLock",
+            devID = node.chipid(),
+            authMeth = "token",
+            port = 8883,    -- 1883 is the unencrypted port
+            event = "iot-2/evt/test/fmt/json",
+            username = "use-token-auth"
+        }
+
+
+-- Calculated values
+mqttContact.hostname = mqttContact.orgID .. ".messaging.internetofthings.ibmcloud.com"
+mqttContact.deviceIdentifier = "d:" .. mqttContact.orgID .. ":" ..
+                                       mqttContact.devType .. ":" .. 
+                                       mqttContact.devID
+mqttContact.password = mqttContact.authToken                                       
+
+
+
+-- Create the MQTT client
+
+m = mqtt.Client(mqttContact.deviceIdentifier, 60, mqttContact.username, mqttContact.password)
+mqttClient = nil
+
+m:on("connect", function(client) 
+    print ("connected") 
+    mqttClient = client
+    print("connected, trying to publish " .. mqttContact.event)
+
+    -- QoS 2 is "exactly once"
+    -- Retain is set to false. It is not supported anyway
+    client:publish("iotdevice-1/mgmt/manage", [[
+        {"d": {
+            "lifetime": 3600,
+            "supports": {
+                "deviceActions": true
+            },
+            "deviceInfo": {
+                "descriptiveLocation": "Somewhere else"
+            }    
+        },
+        
+        "reqId": "test"}
+        ]], 2, 0, function(client)
+       print("published")
+       timer:start()
+    end)
+    client:subscribe("iotdm-1/#", 0, function(conn) 
+        print("subscribe to commands successful") 
+    end)    
+end)
+
+m:on("offline", function(client) 
+    print ("offline") 
+end)
+
+m:on("message", function(client, topic, message)
+   print("Message:" .. topic .. "," .. message)
+end)
+
+m:connect(mqttContact.hostname, mqttContact.port, 1)
+
+
+print(m)
+
+timer = tmr.create()
+
+
+timerCounter = 0
+
+timer:register(30*1000, tmr.ALARM_AUTO, function(t)
+    print("Timer " .. timerCounter)
+    mqttClient:publish(mqttContact.event, '{"eventNum":' .. timerCounter .. '}', 2, 0, function(client)
+       print("published")
+    end)    
+    timerCounter = timerCounter+1
+end)
