@@ -14,13 +14,6 @@ function getHttpsResponse(url, cb)
 
   conn = tls.createConnection()
 
-  conn:on("receive", function(sck, c) 
-    resp = string.match(c, ".+\r\n\r\n(.+)")
-    decoder = sjson.decoder({})
-    decoder:write(resp)
-    cb(decoder:result())
-  end)   -- coon:on("receive") callback
-
   -- Don't send the request before we are connected
   conn:on("connection", function(sck, c)
     req = "GET /" .. path .. [[ HTTP/1.1
@@ -29,6 +22,14 @@ function getHttpsResponse(url, cb)
       Accept: */*]] .. "\r\n\r\n"      
     sck:send(req)
   end)  -- of conn:on("connection") callback
+
+  conn:on("receive", function(sck, c) 
+    resp = string.match(c, ".+\r\n\r\n(.+)")
+    decoder = sjson.decoder({})
+    decoder:write(resp)
+    cb(decoder:result())
+  end)   -- coon:on("receive") callback
+
   
   conn:connect(443,host);  
 end   -- of getHttpsResponse
