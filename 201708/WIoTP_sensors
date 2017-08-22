@@ -1,0 +1,11 @@
+adc.force_init_mode(adc.INIT_ADC)
+
+timer = tmr.create()
+timer:register(1000, tmr.ALARM_AUTO,
+    function (t)
+        print(adc.read(0))
+    end)
+
+timer:start()
+
+    
