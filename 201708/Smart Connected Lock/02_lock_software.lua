@@ -1,4 +1,6 @@
--- Configuration parameters, your values will probably vary
+-- Configuration parameters
+-- change these values for your environment
+
 ssid = "pomeranch"
 wifi_pwd = "<<redacted>>"
 openwhisk_url = "https://service.us.apiconnect.ibmcloud.com/gws/apigateway/api/ec74d9ee76d47d2a5f9c4dbae2510b0b8ae5912b542df3e2d6c8308843e70d59/smartlock/lock_query"
