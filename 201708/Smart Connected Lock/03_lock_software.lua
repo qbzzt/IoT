@@ -1,4 +1,6 @@
--- Configuration parameters, your values will probably vary
+-- Configuration parameters
+-- change these values for your environment
+
 ssid = "pomeranch"
 wifi_pwd = "<<redacted>>"
 openwhisk_url = "https://service.us.apiconnect.ibmcloud.com" .. 
