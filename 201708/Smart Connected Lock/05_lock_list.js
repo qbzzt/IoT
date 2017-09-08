@@ -1,9 +1,5 @@
 var cloudantCred = {
-  "username": "4d1cded5-56a3-4ad9-a59a-9c68c192995c-bluemix",
-  "password": "1f04c7d0cdfcc6d99a8b8ab1a153475f42764f65942df5cc6036e0a813ef37da",
-  "host": "4d1cded5-56a3-4ad9-a59a-9c68c192995c-bluemix.cloudant.com",
-  "port": 443,
-  "url": "https://4d1cded5-56a3-4ad9-a59a-9c68c192995c-bluemix:1f04c7d0cdfcc6d99a8b8ab1a153475f42764f65942df5cc6036e0a813ef37da@4d1cded5-56a3-4ad9-a59a-9c68c192995c-bluemix.cloudant.com"
+<<redacted>>
 };
 
 
