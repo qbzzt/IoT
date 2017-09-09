@@ -24,7 +24,7 @@ var lock = function(id, success) {
             } // leftToLock == 0
         });    // mydb.insert
     });   // mydb.get
-};   // end of modifyEntry
+};   // end of lock
 
 
 
