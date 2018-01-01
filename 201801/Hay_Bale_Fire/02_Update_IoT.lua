@@ -8,7 +8,7 @@ wifiConf = {
     passwd = "<<<redacted>>>"
 }
 
--- IoT Platform coniguration
+-- IoT Platform configuration
 iotPlatformCred = {
     orgID = "kpzxgd",
     devType = "Hay-Sensor",
