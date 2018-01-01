@@ -6,8 +6,10 @@ else
     if status == dht.ERROR_CHECKSUM then
         print("Checksum error, results probably valid")
    end
-   print(string.format("Relative humidify:%4.2f %%\r\n", humi));
-   print(string.format("Temp: %4.2fC = %4.2fF\r\n",
-    temp, temp*5/9+32))
+   print(string.format("Relative humidify:%2.1f%%", humi));
+   print(string.format("Temp: %2.1fC = %3.1fF",
+    temp, temp*9/5+32))
 end
+
+
 
