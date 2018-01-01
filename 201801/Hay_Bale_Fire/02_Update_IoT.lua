@@ -1,7 +1,11 @@
+-- Device configuration
+dht11pin = 1
+updateFreq = 60    -- in seconds
+
 -- WiFi configuration
 wifiConf = {
-    ssid = "pomeranch",
-    passwd = "<<redacted>>"
+    ssid = "Ori",
+    passwd = "<<<redacted>>>"
 }
 
 -- IoT Platform coniguration
@@ -10,8 +14,10 @@ iotPlatformCred = {
     devType = "Hay-Sensor",
     devID = node.chipid(),
     authMethod = "use-token-auth",
-    authToken = "_bc!Ey6UtH3Emv64Iy"
+    authToken = "<<<redacted>>>"
 }
+
+
 
 mqttConf = {
     hostname = iotPlatformCred.orgID .. 
@@ -38,38 +44,46 @@ mqttClient = mqtt.Client(mqttConf.devID, 0,
     mqttConf.userName, mqttConf.password)
 
 
-mqttClient:connect(mqttConf.hostname, mqttConf.port, 0, 
-    function(client)
-        print("connected")
-  
-        client:publish(mqttConf.eventTopic, 
-            '{"temp": 20}', 0, 0, 
-            function(client) 
-                print("sent") 
-            end
-        )    -- End of client:publish
-    end,
-    function(client, reason)
-        print("MQTT client connection failed. Reason:" .. reason)
-    end)  -- end of mqttClient:connect
-
-mqttClient:close();
-
-
-
-status, temp, humi = dht.read11(1)
-
-if status == dht.ERROR_TIMEOUT then
-   print("DHT timed out, is it connected correctly?")
-else
-    if status == dht.ERROR_CHECKSUM then
-        print("Checksum error, results probably valid")
-   end
-   print(string.format("Relative humidify:%2.1f%%", humi));
-   print(string.format("Temp: %2.1fC = %3.1fF",
-    temp, temp*9/5+32))
+function mqttSend(msg)
+    
+    mqttClient:connect(mqttConf.hostname, mqttConf.port, 
+        function(client) 
+            client:publish(mqttConf.eventTopic, 
+                msg, 0, 0, 
+                function(client) 
+                    -- We do not need the client now
+                    mqttClient:close(); 
+                end
+            )    -- End of client:publish
+        end,
+        function(client, reason)
+            print("MQTT client connection failed. Reason:" .. 
+                reason)
+        end)  -- end of mqttClient:connect
 end
 
 
 
+function sendResult(temp, humidity) 
+    jsonMsg = [[ {
+        "temp": ]] .. temp .. [[, 
+        "humidity": ]] .. humidity .. [[
+        } ]]
+   mqttSend(jsonMsg) 
+end
 
+
+function readSensor()
+    status, temp, humidity = dht.read11(dht11pin)
+
+    if (status ~= dht.ERROR_TIMEOUT) then
+        sendResult(temp, humidity)    
+    end
+end
+
+
+
+sensorTimer = tmr.create()
+sensorTimer:register(updateFreq * 1000, tmr.ALARM_AUTO,
+    function() readSensor() end)
+sensorTimer:start()
