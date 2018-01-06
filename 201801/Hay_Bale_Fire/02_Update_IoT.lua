@@ -51,7 +51,7 @@ function mqttSend(msg)
             client:publish(mqttConf.eventTopic, 
                 msg, 0, 0, 
                 function(client) 
-                    -- We do not need the client now
+                    -- We do not need the connection anymore, remove it from the client
                     mqttClient:close(); 
                 end
             )    -- End of client:publish
