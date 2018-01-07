@@ -1,8 +1,8 @@
-const int ledPin = 3;
+const int builtInLED = 25;
 
 void setup() {
   // put your setup code here, to run once:
-    pinMode (ledPin, OUTPUT);
+    pinMode(builtInLED, OUTPUT);
 
 }
 
@@ -10,10 +10,10 @@ void loop() {
   // put your main code here, to run repeatedly:
 
   // On for a second
-  digitalWrite (ledPin, HIGH);  
+  digitalWrite(builtInLED, HIGH);  
   delay(1000); 
 
   // Off for half a second
-  digitalWrite (ledPin, LOW); 
+  digitalWrite(builtInLED, LOW); 
   delay(500); 
 }
