@@ -19,6 +19,7 @@ const spi_pins LORA_SPI_PINS = {.sck=5, .miso=19, .mosi=27, .cs=18, .rst=14, .ir
 
 const int MHz = 1000*1000;
 
+
 void setup() {
 
   pinMode(builtInLED, OUTPUT);
@@ -40,12 +41,30 @@ void setup() {
     while (1)
       ;
   }
+
+
+  // Network configuration. Use the slowest speed and 
+  // highest redundancy. This gives us the maximum possible
+  // range.
+  LoRa.enableCrc();
+  LoRa.setCodingRate4(8);
+  LoRa.setSpreadingFactor(12);
+
+  // The sync word determines which frequencies will be used
+  // when. If it is a value that isn't in common use (the 
+  // common values are 0x12 and 0x34), it reduces the chance
+  // of interference.
+  LoRa.setSyncWord(0x24);
 }
 
-void loop() {
 
-// try to parse packet
+
+
+
+void loop() {
+  // Check if we got a packet
   int packetSize = LoRa.parsePacket();
+  
   if (packetSize) {
     // received a packet
     Serial.print("Received packet '");
@@ -55,8 +74,13 @@ void loop() {
       Serial.print((char)LoRa.read());
     }
 
-    // print RSSI of packet
+    // print RSSI (relative signal strength) of packet
     Serial.print("' with RSSI ");
     Serial.println(LoRa.packetRssi());
-  } 
+
+    // Flash for half a second to show you received a packet
+    digitalWrite(builtInLED, HIGH);  
+    delay(500); 
+    digitalWrite(builtInLED, LOW); 
+  }
 }
