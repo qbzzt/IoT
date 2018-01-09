@@ -34,31 +34,43 @@ void setup() {
     ;
 
   Serial.println("LoRa Receiver");
-
+  
   // US Frequency, use 866*MHz in Europe
   if (!LoRa.begin(915*MHz)) {
-    Serial.println("LoRa starting failed :-(");
+    Serial.println("LoRa.begin failed :-(");
     while (1)
       ;
   }
+
+  // Network configuration. Use the slowest speed and 
+  // highest redundancy. This gives us the maximum possible
+  // range.
+  LoRa.enableCrc();
+  LoRa.setCodingRate4(8);
+  LoRa.setSpreadingFactor(12);
+
+  // The sync word determines which frequencies will be used
+  // when. If it is a value that isn't in common use (the 
+  // common values are 0x12 and 0x34), it reduces the chance
+  // of interference.
+  LoRa.setSyncWord(0x24);
 }
 
 void loop() {
-  int sendingRetVal;
+  int sendSuccess;
+  static int counter = 0;
+  
   LoRa.beginPacket();
-  LoRa.printf("Hello");
+  LoRa.printf("Hello #%d", counter++);
   
-  sendingRetVal = LoRa.endPacket();
+  sendSuccess = LoRa.endPacket();
   
-  Serial.printf("Sending success: %d\n", sendingRetVal );
-
-
-  if (sendingRetVal) {
+  if (sendSuccess) {
     // Short pulse to show the message was sent
     digitalWrite(builtInLED, HIGH);  
     delay(100); 
     digitalWrite(builtInLED, LOW); 
-  }
-
-  delay(1000);
+    delay(900); 
+  } else
+    delay(1000);
 }
