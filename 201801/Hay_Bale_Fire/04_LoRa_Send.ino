@@ -1,6 +1,3 @@
-
-// Based on the tutorial at https://robotzero.one/heltec-wifi-lora-32/
-
 #include <SPI.h>
 #include <LoRa.h>
 
@@ -27,20 +24,11 @@ void setup() {
   SPI.begin(LORA_SPI_PINS.sck, LORA_SPI_PINS.miso, LORA_SPI_PINS.mosi, LORA_SPI_PINS.ss);
   LoRa.setPins(LORA_SPI_PINS.ss, LORA_SPI_PINS.rst, LORA_SPI_PINS.irq);
 
-  // Initialize the serial device, wait until it is available
-  Serial.begin(115200);
-  
-  while (!Serial)
-    ;
-
-  Serial.println("LoRa Receiver");
-  
   // US Frequency, use 866*MHz in Europe
-  if (!LoRa.begin(915*MHz)) {
-    Serial.println("LoRa.begin failed :-(");
+  if (!LoRa.begin(915*MHz)) 
     while (1)
       ;
-  }
+  
 
   // Network configuration. Use the slowest speed and 
   // highest redundancy. This gives us the maximum possible
