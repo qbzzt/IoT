@@ -8,13 +8,13 @@ typedef struct spi_pins {
   int sck;
   int miso;
   int mosi;
-  int cs;
+  int ss;
   int rst;
   int irq;
 };
 
 
-const spi_pins LORA_SPI_PINS = {.sck = 5, .miso = 19, .mosi = 27, .cs = 18, .rst = 14, .irq = 26};
+const spi_pins LORA_SPI_PINS = {.sck = 5, .miso = 19, .mosi = 27, .ss = 18, .rst = 14, .irq = 26};
 
 const int MHz = 1000 * 1000;
 
@@ -23,8 +23,8 @@ void setup() {
 
   pinMode(builtInLED, OUTPUT);
 
-  SPI.begin(LORA_SPI_PINS.sck, LORA_SPI_PINS.miso, LORA_SPI_PINS.mosi, LORA_SPI_PINS.cs);
-  LoRa.setPins(LORA_SPI_PINS.cs, LORA_SPI_PINS.rst, LORA_SPI_PINS.irq);
+  SPI.begin(LORA_SPI_PINS.sck, LORA_SPI_PINS.miso, LORA_SPI_PINS.mosi, LORA_SPI_PINS.ss);
+  LoRa.setPins(LORA_SPI_PINS.ss, LORA_SPI_PINS.rst, LORA_SPI_PINS.irq);
 
   // Initialize the serial device, wait until it is available
   Serial.begin(115200);
