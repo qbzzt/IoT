@@ -83,7 +83,7 @@ void loop() {
     // Make sure the packet is zero terminated
     packet[i] = 0;
 
-    // Print packet and RSSI
+    // Print packet and data
     Serial.printf("%s, with RSSI %d and S/N ratio %4.2f\n", 
       packet, LoRa.packetRssi(), LoRa.packetSnr());
    
