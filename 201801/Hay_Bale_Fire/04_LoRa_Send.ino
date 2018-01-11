@@ -25,7 +25,7 @@ void setup() {
   pinMode(builtInLED, OUTPUT);
   
   SPI.begin(LORA_SPI_PINS.sck, LORA_SPI_PINS.miso, LORA_SPI_PINS.mosi, LORA_SPI_PINS.ss);
-  LoRa.setPins(LORA_SPI_PINS.cs, LORA_SPI_PINS.rst, LORA_SPI_PINS.irq);
+  LoRa.setPins(LORA_SPI_PINS.ss, LORA_SPI_PINS.rst, LORA_SPI_PINS.irq);
 
   // Initialize the serial device, wait until it is available
   Serial.begin(115200);
