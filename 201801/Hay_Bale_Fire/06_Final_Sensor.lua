@@ -24,7 +24,7 @@ end
 
 
 function sendResult(temp, humidity) 
-   requestUrl("/" .. node.chipid() .. "/" .. temp .. "/" .. humidity);
+   requestUrl(node.chipid() .. "/" .. temp .. "/" .. humidity);
 end
 
 
