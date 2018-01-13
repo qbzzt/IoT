@@ -39,6 +39,5 @@ end
 
 
 sensorTimer = tmr.create()
-sensorTimer:register(updateFreq * 1000, tmr.ALARM_AUTO,
-    function() readSensor() end)
+sensorTimer:register(updateFreq * 1000, tmr.ALARM_AUTO, readSensor())
 sensorTimer:start()
