@@ -144,7 +144,7 @@ void handleHTTP(WiFiClient clientConn) {
   // when we try to debug with a browser we get a timeout.
   if (checkReading(path))    
     sendLoRa(path);
-#ifdef LORA    
+#endif
 }
 
 
