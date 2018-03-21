@@ -24,10 +24,14 @@ const spi_pins LORA_SPI_PINS = {.sck=5, .miso=19, .mosi=27, .ss=18, .rst=14, .ir
 
 const int MHz = 1000*1000;
 
+#endif 
+
 
 // The HTTP server for messages
 WiFiServer server(80);
 
+
+#ifdef LORA
 
 void setupLoRa() {
   SPI.begin(LORA_SPI_PINS.sck, LORA_SPI_PINS.miso, LORA_SPI_PINS.mosi, LORA_SPI_PINS.ss);
@@ -144,7 +148,7 @@ void handleHTTP(WiFiClient clientConn) {
   // when we try to debug with a browser we get a timeout.
   if (checkReading(path))    
     sendLoRa(path);
-#endif
+#endif    
 }
 
 
