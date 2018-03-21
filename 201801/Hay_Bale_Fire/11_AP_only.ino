@@ -1,7 +1,14 @@
+
+#ifdef LORA
+
 #include <SPI.h>
 #include <LoRa.h>
 
-#include "WiFi.h"
+#endif
+
+#include <WiFi.h>
+
+#ifdef LORA
 
 typedef struct spi_pins {
   int sck;
@@ -56,6 +63,8 @@ void sendLoRa(String message) {
 
   Serial.printf("LoRa sending on %s, status: %d\n", message.c_str(), success);
 }
+
+#endif
 
 
 void setup() {
