@@ -44,10 +44,10 @@ var plugDiscovered = plug => {
 		console.log("Connected to the plug through Bluetooth");
 
 		plug.discoverSomeServicesAndCharacteristics(plugServices, plugCharacteristics,
-			(err, services, characteristics) => {
-				plugAPI["top"] = characteristics.filter(c => c.uuid === plugChars["top"])[0];
+			(err, services, charObjs) => {
+				plugAPI["top"] = charObjs.filter(c => c.uuid === plugChars["top"])[0];
 
-				setInterval(() => togglePlug(plugAPI("top"), 500);
+				setInterval(() => togglePlug(plugAPI.top, 500);
 		});  // plug.discoverSoServicesAndCharacteristics
 
 	});    // plug.once("connect")
