@@ -47,7 +47,7 @@ var plugDiscovered = plug => {
 			(err, services, charObjs) => {
 				plugAPI["top"] = charObjs.filter(c => c.uuid === plugChars["top"])[0];
 
-				setInterval(() => togglePlug(plugAPI.top, 500);
+				setInterval(() => togglePlug(plugAPI.top, 500));
 		});  // plug.discoverSoServicesAndCharacteristics
 
 	});    // plug.once("connect")
