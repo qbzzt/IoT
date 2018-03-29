@@ -44,9 +44,8 @@ var plugDiscovered = plug => {
 		console.log("Connected to the plug through Bluetooth");
 
 		plug.discoverSomeServicesAndCharacteristics(plugServices, plugCharacteristics,
-			(err, services, characteristics) => 
+			(err, services, characteristics) => {
 				plugAPI["top"] = characteristics.filter(c => c.uuid === plugChars["top"])[0];
-				plugAPI["bottom"] = characteristics.filter(c => c.uuid === plugChars["bottom"])[0];
 
 				setInterval(() => togglePlug(plugAPI("top"), 500);
 		});  // plug.discoverSoServicesAndCharacteristics
