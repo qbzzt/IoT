@@ -52,7 +52,7 @@ var plugDiscovered = plugDevice => {
 				console.log("APIs: " + Object.keys(plugAPI));
 
 				setInterval(() => togglePlug(plugAPI.top), 1000);
-				setInterval(() => togglePlug(plugAPI.bottom), 950);			
+				setInterval(() => togglePlug(plugAPI.bottom), 990);			
 		});  // plugDevice.discoverSoServicesAndCharacteristics
 
 	});    // plugDevice.once("connect")
