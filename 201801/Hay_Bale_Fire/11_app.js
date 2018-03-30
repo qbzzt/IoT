@@ -33,9 +33,6 @@ var togglePlug = (plug) => {
 	readPlug(plug, currentVal => writePlug(plug, !currentVal, () => {}));
 };
 
-noble.startScanning(plugServices);
-
-noble.on("stateChange", state => console.log("Bluetooth state is now " + state));
 
 var plugDiscovered = plugDevice => {
 	noble.stopScanning();
@@ -62,4 +59,6 @@ var plugDiscovered = plugDevice => {
 
 
 
+noble.startScanning(plugServices);
+noble.on("stateChange", state => console.log("Bluetooth state is now " + state));
 noble.on("discover", plugDiscovered);
