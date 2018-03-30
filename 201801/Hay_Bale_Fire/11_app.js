@@ -37,22 +37,27 @@ noble.startScanning(plugServices);
 
 noble.on("stateChange", state => console.log("Bluetooth state is now " + state));
 
-var plugDiscovered = plug => {
+var plugDiscovered = plugDevice => {
 	noble.stopScanning();
 
-	plug.once("connect", () => {
+	plugDevice.once("connect", () => {
 		console.log("Connected to the plug through Bluetooth");
 
-		plug.discoverSomeServicesAndCharacteristics(plugServices, plugCharacteristics,
+		plugDevice.discoverSomeServicesAndCharacteristics(plugServices, plugCharacteristics,
 			(err, services, charObjs) => {
-				plugAPI["top"] = charObjs.filter(c => c.uuid === plugChars["top"])[0];
+				Object.keys(plugChars).map((plugName) => {
+					plugAPI[plugName] = charObjs.filter(c => c.uuid === plugChars[plugName])[0];
+				});
+			
+				console.log("APIs: " + Object.keys(plugAPI));
 
-				setInterval(() => togglePlug(plugAPI.top, 500));
-		});  // plug.discoverSoServicesAndCharacteristics
+				setInterval(() => togglePlug(plugAPI.top), 1000);
+				setInterval(() => togglePlug(plugAPI.bottom), 950);			
+		});  // plugDevice.discoverSoServicesAndCharacteristics
 
-	});    // plug.once("connect")
+	});    // plugDevice.once("connect")
 
-	plug.connect();
+	plugDevice.connect();
 };
 
 
