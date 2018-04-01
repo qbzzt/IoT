@@ -21,10 +21,8 @@ app.get("/:cpu/:temp/:humidity", (req, res) => {
 });
 
 
-app.get("/readings", (req, res) => {
-  res.send(recentReadings);
-});
 
+// Bluetooth
 var devTypeID = "ebdd49acb2e740eb55f5d0ab";
 
 var plugService = "a22bd383" + devTypeID;
@@ -79,6 +77,31 @@ var plugDiscovered = plugDevice => {
 
 	plugDevice.connect();
 };
+
+
+// recentReadings manipulation
+
+// Get the maximum between two numbers
+var max = (a, b) => a > b ? a : b;
+
+// Get the maximum temperature and humidity
+var getMax = (arr) => arr.reduce((a,b) => {
+	return {
+		temp: max(a.temp, b.temp),
+		humidity: max(a.humidity, b.humidity)
+		};
+	}, {temp: 0, humidity: 0}
+);				     
+
+app.get("/readings", (req, res) => {
+  res.send(recentReadings);
+});
+
+
+app.get("/max, (req, res) => {
+  res.send(getMax(recentReadings));
+});
+
 
 
 noble.startScanning(plugServices);
