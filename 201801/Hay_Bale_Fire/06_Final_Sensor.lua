@@ -16,7 +16,7 @@ wifi.sta.config({
 
 
 function requestUrl(path)
-  http.get("http://10.0.0.1/" .. path, nil, 
+  http.get("http://10.0.0.1" .. path, nil, 
   function(code, data)
     print("Got response to " .. path .. ":" .. code )
   end)
