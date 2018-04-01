@@ -10,18 +10,6 @@ var recentReadings = [];
 
 
 
-app.get("/:cpu/:temp/:humidity", (req, res) => {
-  res.send("Hello, world");  // Just to respond with something
-  recentReadings.push({
-    temp: req.params.temp,
-    humidity: req.params.humidity,
-    time: Date.now()
-  });
-  console.log(`${req.params.cpu} reports ${req.params.temp} C and ${req.params.humidity}%`);
-});
-
-
-
 // Bluetooth
 var devTypeID = "ebdd49acb2e740eb55f5d0ab";
 
@@ -69,8 +57,11 @@ var plugDiscovered = plugDevice => {
 				Object.keys(plugChars).map((plugName) => {
 					plugAPI[plugName] = charObjs.filter(c => c.uuid === plugChars[plugName])[0];
 				});
-			
+
 				console.log("APIs: " + Object.keys(plugAPI));
+
+        // Update every minute even if there are no new readings
+        setInterval(update, 60*1000);
 		});  // plugDevice.discoverSoServicesAndCharacteristics
 
 	});    // plugDevice.once("connect")
@@ -85,13 +76,55 @@ var plugDiscovered = plugDevice => {
 var max = (a, b) => a > b ? a : b;
 
 // Get the maximum temperature and humidity
-var getMax = (arr) => arr.reduce((a,b) => {
-	return {
-		temp: max(a.temp, b.temp),
-		humidity: max(a.humidity, b.humidity)
-		};
-	}, {temp: 0, humidity: 0}
-);				     
+var getMax = (arr) => {
+  return arr.reduce((a,b) => {
+	   return {temp: max(a.temp, b.temp), humidity: max(a.humidity, b.humidity)};
+   }, {temp:0, humidity: 0}); // End of arr.reduce
+};    // End of getMax declaration
+
+
+// Remove old (>10 minutes) readings
+var removeOld = () => {
+	recentReadings = recentReadings.filter(a => a.time > Date.now()-10*60*1000);
+};
+
+
+
+// The actual analysis
+
+var update = () => {
+  var fanPlug = plugAPI.top;
+  var heaterPlug = plugAPI.bottom;
+
+  removeOld();
+
+  // No point in updates until we have the plugs
+  if (fanPlug === undefined || heaterPlug === undefined)
+    return;
+
+  maxValues = getMax(recentReadings);
+
+  // Desired states, off by default
+  var fanPlugState = false;
+  var heaterPlugState = false;
+
+  // Try to reduce the temperatue using the fan
+  if (maxValues.temp < 80 && maxValues.temp > 50)
+    fanPlugState = true;
+
+  // Try to dry the hay using the heater
+  if (maxValues.temp < 50 && maxValues.humidity > 20)
+    heaterPlugState = true;
+
+  // Show what is happening
+  console.log(`Update. Maximums: ${JSON.stringify(maxValues)}, fan: ${fanPlugState}, heater: ${heaterPlugState}`);
+
+  // Write the states
+  writePlug(fanPlug, fanPlugState, () => {});
+  writePlug(heaterPlug, heaterPlugState, () => {});
+};
+
+// Debugging information
 
 app.get("/readings", (req, res) => {
   res.send(recentReadings);
@@ -101,6 +134,32 @@ app.get("/readings", (req, res) => {
 app.get("/max", (req, res) => {
   res.send(getMax(recentReadings));
 });
+
+
+app.get("/plugs", (req, res) => {
+    readPlug(plugAPI.top, topState => {
+      readPlug(plugAPI.bottom, bottomState => {
+        res.send(`top plug: ${topState}, bottom plug: ${bottomState}`);
+      });   // readPlug bottom
+    })      // readPlug top
+});         // app.get("/plugs"
+
+
+
+// Process readings
+
+
+app.get("/:cpu/:temp/:humidity", (req, res) => {
+  res.send("Hello, world");  // Just to respond with something
+  recentReadings.push({
+    temp: parseInt(req.params.temp),
+    humidity: parseInt(req.params.humidity),
+    time: Date.now()
+  });
+  console.log(`${req.params.cpu} reports ${req.params.temp} C and ${req.params.humidity}%`);
+  update();
+});
+
 
 
 
