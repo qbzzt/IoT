@@ -9,6 +9,7 @@ var recentReadings = [];
 
 
 
+
 app.get("/:cpu/:temp/:humidity", (req, res) => {
   res.send("Hello, world");  // Just to respond with something
   recentReadings.push({
