@@ -14,7 +14,7 @@ app.get("/:cpu/:temp/:humidity", (req, res) => {
   recentReadings.push({
     temp: req.params.temp,
     humidity: req.params.humidity,
-    time: Date.new()
+    time: Date.now()
   });
   console.log(`${req.params.cpu} reports ${req.params.temp} C and ${req.params.humidity}%`);
 });
