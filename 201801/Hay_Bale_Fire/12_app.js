@@ -70,5 +70,5 @@ noble.on("stateChange", state => console.log("Bluetooth state is now " + state))
 noble.on("discover", plugDiscovered);
 noble.startScanning(plugServices);
 
-// Star the web server. Listen to all IP addresses
-app.listen(80, '0.0.0.0', () => {console.log("Web server started"});
+// Start the web server. Listen to all IP addresses
+app.listen(80, '0.0.0.0', () => {console.log("Web server started")});
