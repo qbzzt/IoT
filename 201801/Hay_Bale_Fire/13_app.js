@@ -98,7 +98,7 @@ app.get("/readings", (req, res) => {
 });
 
 
-app.get("/max, (req, res) => {
+app.get("/max", (req, res) => {
   res.send(getMax(recentReadings));
 });
 
