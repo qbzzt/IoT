@@ -59,7 +59,6 @@ var plugDiscovered = plugDevice => {
 
 
 
-
+noble.startScanning(plugServices);
 noble.on("stateChange", state => console.log("Bluetooth state is now " + state));
 noble.on("discover", plugDiscovered);
-noble.startScanning(plugServices);
