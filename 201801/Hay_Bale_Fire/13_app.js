@@ -58,10 +58,10 @@ var plugDiscovered = plugDevice => {
 					plugAPI[plugName] = charObjs.filter(c => c.uuid === plugChars[plugName])[0];
 				});
 
-				console.log("APIs: " + Object.keys(plugAPI));
+			console.log("APIs: " + Object.keys(plugAPI));
 
-        // Update every minute even if there are no new readings
-        setInterval(update, 60*1000);
+        			// Update every minute even if there are no new readings
+        		setInterval(update, 60*1000);
 		});  // plugDevice.discoverSoServicesAndCharacteristics
 
 	});    // plugDevice.once("connect")
@@ -108,7 +108,7 @@ var update = () => {
   var fanPlugState = false;
   var heaterPlugState = false;
 
-  // Try to reduce the temperatue using the fan
+  // Try to reduce the temperature using the fan
   if (maxValues.temp < 80 && maxValues.temp > 50)
     fanPlugState = true;
 
