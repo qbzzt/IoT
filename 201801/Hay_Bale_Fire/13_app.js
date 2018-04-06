@@ -102,7 +102,7 @@ var update = () => {
   if (fanPlug === undefined || heaterPlug === undefined)
     return;
 
-  maxValues = getMax(recentReadings);
+  var maxValues = getMax(recentReadings);
 
   // Desired states, off by default
   var fanPlugState = false;
