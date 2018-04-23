@@ -1,0 +1,111 @@
+
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Fake Hay Bale Sensor Results</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+    <!--  Use the Angular library  -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular-sanitize.js"></script>
+
+    <!-- Definitions that need to appear before the quiz variable -->
+    <script type="text/javascript">
+
+
+    var myApp = angular.module("myApp", []);
+    var scope;
+
+
+    // The $http is to use HTTP to retrieve the statistics.
+    myApp.controller("myCtrl", function($scope, $http) {
+    	// Make the scope available outside the controller, which is very useful for
+    	// debugging
+    	scope = $scope;
+
+      $scope.tempC = 40;
+      $scope.humidity = 10;
+
+      $scope.orgID = "kpzxgd";
+      $scope.sensorID = "15740476";
+      $scope.authToken = "15740476";
+      $scope.results = "";
+
+      // Remove artifacts of floating point calculations
+      $scope.tempF = () => Math.round(($scope.tempC*1.8+32)*10)/10;
+
+      // Submit the sensor readings
+      $scope.submitReadings = () => {
+        var hostname = `${$scope.orgID}.messaging.internetofthings.ibmcloud.com`;
+        var url = `http://${hostname}:1883/api/v0002/` +
+          `device/types/Hay-Sensor/devices/${$scope.sensorID}/events/sensorReading`;
+        var authdata = btoa(`use-token-auth:${$scope.authToken}`).slice(0, -1);
+
+        var data = `{"temp": ${$scope.tempC}, "humidity": ${$scope.humidity}}`;
+
+        $http.post(url, data, {
+            headers:{
+              'Content-Type': 'application/json',
+              'Authorization': `Basic ${authdata}`
+            }
+          }).
+          then(
+            () => console.log("POST success"),
+            (err) => console.log(`Error: ${JSON.stringify(err)}`)
+          );
+      };
+
+    });   // end of myApp.controller call
+
+
+    </script>
+
+
+  </head>
+
+  <body ng-app="myApp" ng-controller="myCtrl">
+    <table class="table table-striped">
+      <tr>
+        <th>Temperature</th>
+        <td>{{tempF()}} &deg;F = {{tempC}} &deg;C</td>
+        <td><input type="range" ng-model="tempC" min="0" max="100"/></td>
+      </tr>
+      <tr>
+        <th>Humidity</th>
+        <td>{{humidity}} %</td>
+        <td><input type="range" ng-model="humidity" min="0" max="100"/></td>
+      </tr>
+      <tr>
+        <th>Organization indentifier</th>
+        <td colsapn="2">
+          <input ng-model="orgID">
+        </td>
+      </tr>
+      <tr>
+        <th>Sensor identifier</th>
+        <td colsapn="2">
+          <input ng-model="sensorID">
+        </td>
+      </tr>
+      <tr>
+        <th>Authentication token</th>
+        <td colsapn="2">
+          <input ng-model="authToken">
+        </td>
+      </tr>
+    </table>
+
+    <button type="button" class="btn btn-lg btn-primary" ng-click="submitReadings()">
+      Submit the sensor readings
+    </button>
+    <br />
+    {{results}}
+  </body>
+</html>
