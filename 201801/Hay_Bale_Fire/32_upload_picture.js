@@ -29,7 +29,7 @@ const objectStorage = new ObjectStorageLib.S3({
 	endpoint: storageEndpoint,
 	apiKeyId: serviceAcctCred.apikey,
 	ibmAuthEndpoint: 'https://iam.ng.bluemix.net/oidc/token',
-    serviceInstanceId: serviceAcctCred.resource_instance_id
+    	serviceInstanceId: serviceAcctCred.resource_instance_id
 });
 
 
