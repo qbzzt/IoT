@@ -1,12 +1,6 @@
 // Credential and configuration for the IBM Cloud Object Storage
 const serviceAcctCred = {
-  "apikey": "J6N4QW5g5o0rMV35ovRPjJ3A0epTEjNFqe86dwFDkYH0",
-  "endpoints": "https://cos-service.bluemix.net/endpoints",
-  "iam_apikey_description": "Auto generated apikey during resource-key operation for Instance - crn:v1:bluemix:public:cloud-object-storage:global:a/5aa16d43d02e6aec9a3ee46954d11fbb:292726d9-dd55-4d6e-917b-fecc6fa111a4::",
-  "iam_apikey_name": "auto-generated-apikey-2fc314fa-5d9d-4b3e-83fa-64a04fa31e56",
-  "iam_role_crn": "crn:v1:bluemix:public:iam::::serviceRole:Writer",
-  "iam_serviceid_crn": "crn:v1:bluemix:public:iam-identity::a/5aa16d43d02e6aec9a3ee46954d11fbb::serviceid:ServiceId-da33fb0b-9b63-4f29-99bc-a31abf24de4d",
-  "resource_instance_id": "crn:v1:bluemix:public:cloud-object-storage:global:a/5aa16d43d02e6aec9a3ee46954d11fbb:292726d9-dd55-4d6e-917b-fecc6fa111a4::"	
+    <<redacted>>
 };
 
 const storageEndpoint = "s3-api.us-geo.objectstorage.softlayer.net";
@@ -14,12 +8,7 @@ const storageEndpoint = "s3-api.us-geo.objectstorage.softlayer.net";
 
 // Credential for IBM Watson Visual Recognition
 const visualRecognitionCred = {
-  "apikey": "bHCJHza56VZDTkqlCvEB590PV4WzthZ1cwyUFcXYdVHp",
-  "iam_apikey_description": "Auto generated apikey during resource-key operation for Instance - crn:v1:bluemix:public:watson-vision-combined:us-south:a/5aa16d43d02e6aec9a3ee46954d11fbb:587f4533-e56b-497e-bb3f-c4dad8f6a588::",
-  "iam_apikey_name": "auto-generated-apikey-103085ab-f8ef-49d8-9ab8-6ada91b90e69",
-  "iam_role_crn": "crn:v1:bluemix:public:iam::::serviceRole:Manager",
-  "iam_serviceid_crn": "crn:v1:bluemix:public:iam-identity::a/5aa16d43d02e6aec9a3ee46954d11fbb::serviceid:ServiceId-da33fb0b-9b63-4f29-99bc-a31abf24de4d",
-  "url": "https://gateway.watsonplatform.net/visual-recognition/api"
+    <<redacted>>	
 };
 
 
