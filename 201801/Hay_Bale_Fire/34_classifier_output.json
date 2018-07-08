@@ -1,0 +1,75 @@
+{
+  "images": [
+    {
+      "classifiers": [
+        {
+          "classifier_id": "default",
+          "name": "default",
+          "classes": [
+            {
+              "class": "hayloft",
+              "score": 0.72,
+              "type_hierarchy": "/floor/hayloft"
+            },
+            {
+              "class": "floor",
+              "score": 0.72
+            },
+            {
+              "class": "barn",
+              "score": 0.676,
+              "type_hierarchy": "/building/farm building/barn"
+            },
+            {
+              "class": "farm building",
+              "score": 0.676
+            },
+            {
+              "class": "building",
+              "score": 0.762
+            },
+            {
+              "class": "sawmill",
+              "score": 0.647,
+              "type_hierarchy": "/factory/sawmill"
+            },
+            {
+              "class": "factory",
+              "score": 0.648
+            },
+            {
+              "class": "Lumber Mill",
+              "score": 0.501,
+              "type_hierarchy": "/building/Lumber Mill"
+            },
+            {
+              "class": "stall",
+              "score": 0.5,
+              "type_hierarchy": "/indoors/compartment/stall"
+            },
+            {
+              "class": "compartment",
+              "score": 0.5
+            },
+            {
+              "class": "indoors",
+              "score": 0.5
+            },
+            {
+              "class": "beige color",
+              "score": 0.861
+            },
+            {
+              "class": "light brown color",
+              "score": 0.829
+            }
+          ]
+        }
+      ],
+      "source_url": "https://s3-api.us-geo.objectstorage.softlayer.net/images4detection/picture.png",
+      "resolved_url": "https://s3-api.us-geo.objectstorage.softlayer.net/images4detection/picture.png"
+    }
+  ],
+  "images_processed": 1,
+  "custom_classes": 0
+}
