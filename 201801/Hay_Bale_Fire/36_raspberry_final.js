@@ -104,5 +104,5 @@ const processPicture = () => {
 
 processPicture();
 
-// Process a picture every ten minutes
+// Process a picture every freq minutes
 setInterval(processPicture, 1000*60*freq);
