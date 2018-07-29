@@ -1,7 +1,8 @@
 
+
 // Credential for the IBM Cloudant database
 const cloudantCred = {
-  <<redcated>>
+    <<redacted>>
 };
 
 const database = "device_objects";
@@ -15,7 +16,7 @@ const db = cloudant.db.use(database);
 
 // Credential and configuration for the IBM Cloud Object Storage
 const cloudObjCred = {
-  <<redcated>>
+    <<redacted>>
 };
 
 const storageEndpoint = "s3-api.us-geo.objectstorage.softlayer.net";
@@ -24,7 +25,7 @@ const bucket = "images4detection";
 
 // Credential for IBM Watson Visual Recognition
 const visualRecognitionCred = {
-  <<redcated>>
+    <<redacted>>
 };
 
    
@@ -39,20 +40,24 @@ const visualRecognition = new VisualRecognitionV3({
 
 
 // For sending e-mail
-const SendGridAPIKey = <<redcated>>;
+const SendGridAPIKey =     <<redacted>>
+
 const sourceEmail = "notices@example.com";
-const destEmail = <<your e-mail here>>;
+
+const destEmail = "qbzzt1@gmail.com";
+
 const https = require("https");
 
 
-const list2HTML = lst => {
+const list2HTML = (lst) => {
     if (lst.length == 0)
         return "None";
     
     return `<ul>${lst.map(x => "<li>"+x+"</li>").reduce((a,b) => a+b, " ")}</ul>`;
 };
 
-const makeMsg = (newObjs, missingsObjs) => {
+
+const makeMsg = (newObjs, missingsObjs, pictureURL) => {
     return `
         <H2>Changes</H2>
         <h4>New objects:</h4>
@@ -62,13 +67,13 @@ const makeMsg = (newObjs, missingsObjs) => {
         ${list2HTML(missingsObjs)}
         
         <h4>Picture</h4>
-        <img src="">
+        <img src="${pictureURL}" height="500" width="800">
     `;
 };   // makeMsg
 
 
 
-const informUserFunc = (newObjs, missingObjs, devID, success) => {
+const informUserFunc = (newObjs, missingObjs, devID, pictureURL, success) => {
 
     const req = https.request({
         method: "POST",
@@ -86,26 +91,13 @@ const informUserFunc = (newObjs, missingObjs, devID, success) => {
         });
     });  // end of https.request
     
-    // write data to request body
-/*    req.write(
-        `{  
-            "personalizations":[{"to":[{"email":${destEmail}}]}],
-            "from":{"email":${sourceEmail}},
-            "subject": "Changes in device ${devID}",
-            "content":[{  
-                "type": "text/html",
-                "value": "Te<b>st</b>"
-//                "value": "${makeMsg(newObjs, missingObjs)}"
-            }]
-        }`); */
-    
     const mailToSend = 
         {"personalizations": [{"to": [{"email": destEmail}]}],
             "from": {"email": sourceEmail},
             "subject": `Changes in device ${devID}`,
             "content": [{
                 "type": "text/html", 
-                "value": makeMsg(newObjs, missingObjs)
+                "value": makeMsg(newObjs, missingObjs, pictureURL)
             }]
         };
         
@@ -117,21 +109,27 @@ const informUserFunc = (newObjs, missingObjs, devID, success) => {
 
 
 const main = params => {
+    
     if (params.objName == undefined) {
         return new Promise((success, failure) => {
-            informUserFunc(["new"], ["missing"], "devID", success);      
+            const pictureURL = 
+                `https://${storageEndpoint}/${bucket}/pict_b8:27:eb:0a:ff:26_2018-07-23T15:34:30.788Z.png`
+            
+            informUserFunc(["new"], ["missing"], "devID", pictureURL, success);      
         });
     };
+
     // Parse the object name to get the information encoded in it
     const splitObjName = params.objName.split(".")[0].split("_");
     const devID = splitObjName[1];
     const timestamp = splitObjName[2];
-    
+   
+    const pictureURL = `https://${storageEndpoint}/${bucket}/${params.objName}`;
 
     // Classify the objects in the image
 	const visRecParams = {
-			url: `https://${storageEndpoint}/${bucket}/${params.objName}`
-		};
+			url: pictureURL
+	};
 
     // Classification takes time, so we need to return a Promise object.		
 	return new Promise((success, failure) => {
@@ -180,7 +178,7 @@ const main = params => {
 
                 // Compare the old data with the new one, update as needed and update the database
                 // (also, inform the user if needed)
-                compareData(objects, result, timestamp, success, failure);
+                compareData(objects, result, timestamp, pictureURL, success, failure);
             });   // end of db.get
         });  // end of visualRecognition.classify
 	});  // end of new Promise
@@ -188,9 +186,10 @@ const main = params => {
 
 
 
+
 // Compare the old data with the new one, update as needed and update the database
 // (also, inform the user if needed)
-const compareData = (objects, result, timestamp, success, failure) => {
+const compareData = (objects, result, timestamp, pictureURL, success, failure) => {
     var data = result.data;  
     var newObjects = [];
     var missingObjects = [];
@@ -227,6 +226,7 @@ const compareData = (objects, result, timestamp, success, failure) => {
     const devID = result._id;
     
     db.insert(newEntry, (err, result) => {
+
         if (err) {
             failure({
                 errLoc: "db.insert",
@@ -237,7 +237,7 @@ const compareData = (objects, result, timestamp, success, failure) => {
         
         // Do we need to inform a human?
         if (newObjects.length > 0 || missingObjects.length > 0) 
-            informUserFunc(newObjects, missingObjects, devID, success)
+            informUserFunc(newObjects, missingObjects, devID, pictureURL, success)
         else
             success({status: "no change"});
     });  // end of db.insert
