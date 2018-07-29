@@ -41,11 +41,8 @@ const visualRecognition = new VisualRecognitionV3({
 
 // For sending e-mail
 const SendGridAPIKey =     <<redacted>>
-
 const sourceEmail = "notices@example.com";
-
-const destEmail = "qbzzt1@gmail.com";
-
+const destEmail = <<your value here>>
 const https = require("https");
 
 
