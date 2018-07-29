@@ -63,7 +63,7 @@ const makeMsg = (newObjs, missingsObjs, pictureURL) => {
         <h4>Missing objects:</h4>
         ${list2HTML(missingsObjs)}
         
-        <h4>Picture</h4>
+        <H2>Picture</H2>
         <img src="${pictureURL}" height="500" width="800">
     `;
 };   // makeMsg
