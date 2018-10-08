@@ -88,13 +88,15 @@ const processPicture = () => {
 				
 				// Replace the picture with the new one.
 				fs.rename(newPictFname, currentPict, (err) => {
-					console.log(`Rename to ${currentPict}. Err: ${err}`);
+					if (err)
+						console.log(`Rename to ${currentPict} error: ${err}`);
 				});  // fs.rename
 			
 			});  // imgSSIM
 		} else {  // if (fs.existsSync())
 			fs.rename(newPictFname, currentPict, (err) => {
-				console.log(`NO ${currentPict} yet, rename. Err: ${err}`);
+				if (err)
+					console.log(`NO ${currentPict} yet, rename error: ${err}`);
 			});  // fs.rename
 		} // if (fs.existsSync())
 		
