@@ -12,7 +12,8 @@ const threshold = 0.75;
 // Directory to store pictures
 const pictDir = "/tmp";
 
-const NodeWebcam = require( "node-webcam" );
+
+const PiCamera = require('pi-camera');
 
 // Takes about 20 minutes to install
 const imgSSIM = require("img-ssim");
@@ -23,23 +24,6 @@ const fs = require("fs");
 // HTTP client code
 const http = require('http');
  
- 
-// Create webcam instance 
-const Webcam = NodeWebcam.create({
-	// The output can be png or jpeg
-    output: "png",
- 
-	// Use the default device
-    device: false,
- 
-	// The picture can be provided as a buffer or a
-	// base64 string - but in this case we want to
-	// store it in a file 
-    callbackReturn: "location"
- 
-});  // NodeWebcam.create
- 
-
 
 
 // Get a timestamp for the current slice of time
@@ -72,7 +56,15 @@ const processPicture = () => {
 	const currentPict = getFname();
 	
 	// Take new picture
-	Webcam.capture(newPictFname, (err, data) => {
+
+
+	const myCamera = new PiCamera({
+		mode: 'photo',
+		output: newPictFname,
+		nopreview: true
+	});
+
+	myCamera.snap().then(result => {
 		if (err) {
 			console.log(`Webcam.capture error: ${err}`);
 			return ;  // Exit the function call
@@ -106,7 +98,7 @@ const processPicture = () => {
 			});  // fs.rename
 		} // if (fs.existsSync())
 		
-	});  // Webcam.capture
+	});  // myCamera.snap().then
 };  // processPicture definition
 
 
