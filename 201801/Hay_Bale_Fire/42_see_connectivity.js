@@ -30,7 +30,6 @@ const checkConn = () => {
 // Called when application is started.
 const OnStart = () => {
     setInterval(checkConn, 6000);
-    app.WifiConnect("barn-net", "");
     app.SetOnWifiChange(checkConn);
     checkConn();
 };   // OnStart
