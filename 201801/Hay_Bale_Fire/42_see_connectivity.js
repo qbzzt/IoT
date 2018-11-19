@@ -1,15 +1,28 @@
-var lay = "none";'
+var lay = "none";
+
+// Clear the screen
+const clearScreen = () => {
+	if (lay !== "none")
+		app.RemoveLayout(lay);
+	
+	lay = app.CreateLayout("linear", "VCenter,FillXY");
+	app.AddLayout(lay);
+}; // clearScreen
+
+
+
+// Add a string to the screen
+const showString = str => {
+	lay.AddChild(app.CreateText(str));
+}; // showString
+
+
 
 // Check connectivity
 const checkConn = () => {
-  if (lay !== "none") app.RemoveLayout(lay);
-
-	lay = app.CreateLayout("linear", "VCenter,FillXY");	 
-	const ssid = app.GetSSID();
-	const ip = app.GetIPAddress();
-	lay.AddChild(app.CreateText(`SSID: ${ssid}`));
-	lay.AddChild(app.CreateText(`IP: ${ip}`));	
-  app.AddLayout(lay);
+	clearScreen();
+	showString(`SSID: ${app.GetSSID()}`);
+	showString(`IP: ${app.GetIPAddress()}`);
 };  // checkConn
 
 
