@@ -24,28 +24,43 @@ const readData = () => {
     app.HttpRequest("GET", "http://10.0.0.1/data", null, null, 
         (err, reply) => {
             if (err) {
-                alert("Error getting data from Raspberry Pi");
-                showString(reply);
+                showString(`Err: ${err}`);
+                showString(`${reply}`);
+                
+                return ;
             }  // if (err)
             
-            readings = readings.concat(JSON.parse(reply));
+            try {
+                readings = JSON.parse(reply);
+                readings = readings.concat(JSON.parse(reply));
+            } catch (err) {
+                showString(`Parse error ${err}`);
+            }
         });  // app.HttpRequest
 };  // readData
 
 
-// Check connectivity
+// Main loop
 const mainLoop = () => {
 	clearScreen();
 	showString(`SSID: ${app.GetSSID()}`);
 	showString(`IP: ${app.GetIPAddress()}`);
+	if (app.GetSSID() === '"barn_net"')
+		readData();
 	showString(`Readings so far: ${JSON.stringify(readings)}`);
-	readData();
 };  // checkConn
 
+
+// Connect to the WiFi
+const connectWifi = () => {
+	if (app.GetSSID() !== '"barn_net"')
+	    app.WifiConnect("barn_net", "");
+};  // connectWifi
 
 
 // Called when application is started.
 const OnStart = () => {
     setInterval(mainLoop, 6000);
+    setInterval(connectWifi, 6000);
     mainLoop();
 };   // OnStart
