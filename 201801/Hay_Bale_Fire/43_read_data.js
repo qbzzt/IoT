@@ -1,6 +1,6 @@
 var lay = "none";
 
-var readingsNum = 0;
+var readings = [];
 
 // Clear the screen
 const clearScreen = () => {
@@ -28,18 +28,17 @@ const readData = () => {
                 showString(reply);
             }  // if (err)
             
-            newReadings = JSON.parse(reply);
-            readingsNum += newReadings.length;
+            readings = readings.concat(JSON.parse(reply));
         });  // app.HttpRequest
 };  // readData
 
 
 // Check connectivity
-const checkConn = () => {
+const mainLoop = () => {
 	clearScreen();
 	showString(`SSID: ${app.GetSSID()}`);
 	showString(`IP: ${app.GetIPAddress()}`);
-	showString(`Readings so far: ${readingsNum}`);
+	showString(`Readings so far: ${JSON.stringify(readings)}`);
 	readData();
 };  // checkConn
 
@@ -47,7 +46,6 @@ const checkConn = () => {
 
 // Called when application is started.
 const OnStart = () => {
-    setInterval(checkConn, 6000);
-    app.SetOnWifiChange(checkConn);
-    checkConn();
+    setInterval(mainLoop, 6000);
+    mainLoop();
 };   // OnStart
