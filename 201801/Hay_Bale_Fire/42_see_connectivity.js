@@ -19,19 +19,18 @@ const showString = str => {
 
 
 // Check connectivity
-const checkConn = () => {
+const mainLoop = () => {
 	clearScreen();
 	showString(`SSID: ${app.GetSSID()}`);
 	showString(`IP: ${app.GetIPAddress()}`);
-};  // checkConn
+};  // mainLoop
 
 
 
 // Called when application is started.
 const OnStart = () => {
-    setInterval(checkConn, 6000);
-    app.SetOnWifiChange(checkConn);
-    checkConn();
+    setInterval(mainLoop, 6000);
+    mainLoop();
 };   // OnStart
 
 
