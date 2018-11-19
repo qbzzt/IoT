@@ -31,13 +31,12 @@ const readData = () => {
             }  // if (err)
             
             try {
-                readings = JSON.parse(reply);
                 readings = readings.concat(JSON.parse(reply));
-            } catch (err) {
-                showString(`Parse error ${err}`);
-            }
+            } catch (err) { showString(`Parse error ${err}`); }
         });  // app.HttpRequest
 };  // readData
+
+
 
 
 // Main loop
