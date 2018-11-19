@@ -51,16 +51,8 @@ const mainLoop = () => {
 };  // checkConn
 
 
-// Connect to the WiFi
-const connectWifi = () => {
-	if (app.GetSSID() !== '"barn_net"')
-	    app.WifiConnect("barn_net", "");
-};  // connectWifi
-
-
 // Called when application is started.
 const OnStart = () => {
     setInterval(mainLoop, 6000);
-    setInterval(connectWifi, 6000);
     mainLoop();
 };   // OnStart
