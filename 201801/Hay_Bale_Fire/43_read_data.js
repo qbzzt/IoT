@@ -48,7 +48,7 @@ const mainLoop = () => {
 	if (app.GetSSID() === '"barn_net"')
 		readData();
 	showString(`Readings so far: ${JSON.stringify(readings)}`);
-};  // checkConn
+};  // mainLoop
 
 
 // Called when application is started.
