@@ -29,6 +29,6 @@ const sendReading = (temp, humidity, time) => {
 
 // Called when application is started.
 const OnStart = () => {		
-	sendReading(50,90);	
+	sendReading(90,90);	
 }   // OnStart
 
