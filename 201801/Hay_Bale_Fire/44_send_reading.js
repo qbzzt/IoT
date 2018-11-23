@@ -15,15 +15,14 @@ const path = `/api/v0002/device/types/${params.devType}/devices/${params.devID}/
 
 const url = `http://${server}:${port}${path}`;
  
-
-const sendReading = (temp, humidity) => {
+const sendReading = (temp, humidity, time) => {
     const xhr = new XMLHttpRequest();
     
     xhr.open("POST", url);    
     xhr.setRequestHeader("Authorization", 
         "Basic " + btoa(`use-token-auth:${params.authToken}`));
-    xhr.send(JSON.stringify({temp: temp, humidity:humidity}));
-}; // sendReading    
+    xhr.send(JSON.stringify({temp: temp, humidity:humidity, time: time}));
+}; // sendXhr    
     
     
 
