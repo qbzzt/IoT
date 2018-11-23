@@ -16,7 +16,7 @@ const path = `/api/v0002/device/types/${params.devType}/devices/${params.devID}/
 const url = `http://${server}:${port}${path}`;
  
 
-const sendReading = (temp, humidity, time) => {
+const sendReading = (temp, humidity) => {
     const xhr = new XMLHttpRequest();
     
     xhr.open("POST", url);    
