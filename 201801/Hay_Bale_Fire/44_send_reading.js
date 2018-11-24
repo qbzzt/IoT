@@ -22,7 +22,7 @@ const sendReading = (temp, humidity, time) => {
     xhr.setRequestHeader("Authorization", 
         "Basic " + btoa(`use-token-auth:${params.authToken}`));
     xhr.send(JSON.stringify({temp: temp, humidity:humidity, time: time}));
-}; // sendXhr    
+}; // sendReading    
     
     
 
