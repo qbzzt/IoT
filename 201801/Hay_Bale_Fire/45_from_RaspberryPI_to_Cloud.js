@@ -63,10 +63,6 @@ const sendReading = (data) => {
     const url = `http://${server}:${port}${path}`;    
     xhr.open("POST", url);    
     
-    events = ["load", "progress", "error", "abort"];
-    
-    events.map(ev => xhr.addEventListener(ev, (cb) => alert(`${ev} says ${JSON.stringify(cb)}`)));
-
     xhr.setRequestHeader("Authorization", 
         "Basic " + btoa(`use-token-auth:${params.authToken}`));
     xhr.send(JSON.stringify({
