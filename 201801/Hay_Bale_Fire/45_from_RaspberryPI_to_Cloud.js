@@ -86,7 +86,7 @@ const sendData = () => {
     
     showString(`Sending ${sendMe.length} readings`);
     
-    sendMe.map(reading => sendReading(JSON.stringify(reading)));
+    sendMe.map(reading => sendReading(reading));
 };   // sendData
 
 
