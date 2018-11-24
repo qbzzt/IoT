@@ -2,20 +2,17 @@ const params = {
     orgID: "86nt5n",
     devType: "Hay-Sensor",
     authToken: "token314",
-    evType: "sensorReading",
-    devID: "314"
+    evType: "sensorReading"
 };  // params
 
 
 const server = `${params.orgID}.messaging.internetofthings.ibmcloud.com`;
 const port = 1883;
-const path = `/api/v0002/device/types/${params.devType}/devices/${params.devID}/events/${params.evType}`;
-
-const url = `http://${server}:${port}${path}`;
-
 
 
 var lay = "none";
+
+var readings = [];
 
 // Clear the screen
 const clearScreen = () => {
@@ -35,23 +32,9 @@ const showString = str => {
 
 
 
-// Send a reading 
-const sendReading = (temp, humidity, time) => {
-    const xhr = new XMLHttpRequest();
-    
-    xhr.open("POST", url);    
-    xhr.setRequestHeader("Authorization", 
-        "Basic " + btoa(`use-token-auth:${params.authToken}`));
-    xhr.send(JSON.stringify({temp: temp, humidity:humidity, time: time}));
-}; // sendXhr    
-    
-
-
 
 // Read data from the the Raspberry Pi
-const readData = () => {
-    var readings;
-    
+const readData = () => {    
     app.HttpRequest("GET", "http://10.0.0.1/data", null, null, 
         (err, reply) => {
             if (err) {
@@ -62,12 +45,49 @@ const readData = () => {
             }  // if (err)
             
             try {
-                readings = JSON.parse(reply);
+                readings = readings.concat(JSON.parse(reply));
             } catch (err) { showString(`Parse error ${err}`); }
         });  // app.HttpRequest
         
-    showString(JSON.stringify(readings));
+    showString(`Readings: ${readings.length}`);
 };  // readData
+
+
+
+// Send a reading 
+const sendReading = (data) => {
+    const xhr = new XMLHttpRequest();
+    const path = `/api/v0002/device/types/${params.devType
+        }/devices/${data.cpu}/events/${params.evType}`;
+
+    const url = `http://${server}:${port}${path}`;    
+    xhr.open("POST", url);    
+    
+    events = ["load", "progress", "error", "abort"];
+    
+    events.map(ev => xhr.addEventListener(ev, (cb) => alert(`${ev} says ${JSON.stringify(cb)}`)));
+
+    xhr.setRequestHeader("Authorization", 
+        "Basic " + btoa(`use-token-auth:${params.authToken}`));
+    xhr.send(JSON.stringify({
+        temp: data.temp, 
+        humidity: data.humidity, 
+        time: data.time})
+    );   // xhr.send
+}; // sendXhr    
+    
+
+
+
+
+const sendData = () => {
+    const sendMe = readings;
+    readings = [];
+    
+    showString(`Sending ${sendMe.length} readings`);
+    
+    sendMe.map(reading => sendReading(JSON.stringify(reading)));
+};   // sendData
 
 
 
@@ -77,8 +97,15 @@ const mainLoop = () => {
 	clearScreen();
 	showString(`SSID: ${app.GetSSID()}`);
 	showString(`IP: ${app.GetIPAddress()}`);
+	showString(`Connected: ${app.IsConnected()}`);
 	if (app.GetSSID() === '"barn_net"')
 		readData();
+	else
+	// If we're connected to WiFi, and it's not barn_net, 
+	// we can send the data to the cloud
+	    if (app.IsConnected())
+	        sendData();
+	                          
 };  // mainLoop
 
 
