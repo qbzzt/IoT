@@ -4,33 +4,31 @@ updateFreq = 60    -- in seconds
 
 -- WiFi configuration
 wifiConf = {
-    ssid = "Ori",
-    passwd = "<<<redacted>>>"
+    ssid = "pomeranch",
+    passwd = <<redacted>>
 }
 
 -- IoT Platform configuration
 iotPlatformCred = {
-    orgID = "kpzxgd",
+    orgID = <<redacted>>,
     devType = "Hay-Sensor",
     devID = node.chipid(),
     authMethod = "use-token-auth",
-    authToken = "<<<redacted>>>"
+    authToken = <<redacted>>
 }
 
+hostname = string.format("%s.messaging.internetofthings.ibmcloud.com",
+    iotPlatformCred.orgID)
 
+url = string.format("https://%s/api/v0002/device/types/%s/devices/%d/events/sensorReading",
+    hostname, iotPlatformCred.devType, iotPlatformCred.devID)
 
-mqttConf = {
-    hostname = iotPlatformCred.orgID .. 
-        ".messaging.internetofthings.ibmcloud.com",
-    port = 1883,
-    devID = "d:" .. iotPlatformCred.orgID .. ":" ..
-        iotPlatformCred.devType .. ":" ..
-        iotPlatformCred.devID,
-    userName = iotPlatformCred.authMethod,
-    password = iotPlatformCred.authToken,
-    eventTopic = "iot-2/evt/sensorReading/fmt/JSON"
-}
-
+httpHeaders = 
+    "Content-Type: application/json\r\n" .. 
+    "Authorization: Basic " ..
+        encoder.toBase64(iotPlatformCred.authMethod .. ":" ..
+                         iotPlatformCred.authToken) ..
+    "\r\n"
 
 
 -- Actually connect
@@ -39,37 +37,25 @@ wifi.sta.config({
   ssid = wifiConf.ssid,
   pwd = wifiConf.passwd,
 })
-    
-mqttClient = mqtt.Client(mqttConf.devID, 0, 
-    mqttConf.userName, mqttConf.password)
 
 
-function mqttSend(msg)
+function httpSend(jsonMsg) 
+    print(jsonMsg)
+    http.post(url, httpHeaders, jsonMsg, 
+        function(code, data)
+            print(code, data)
+        end
+    )
     
-    mqttClient:connect(mqttConf.hostname, mqttConf.port, 
-        function(client) 
-            client:publish(mqttConf.eventTopic, 
-                msg, 0, 0, 
-                function(client) 
-                    -- We do not need the connection anymore, remove it from the client
-                    mqttClient:close(); 
-                end
-            )    -- End of client:publish
-        end,
-        function(client, reason)
-            print("MQTT client connection failed. Reason:" .. 
-                reason)
-        end)  -- end of mqttClient:connect
 end
+    
 
-
-
-function sendResult(temp, humidity) 
-    jsonMsg = [[ {
-        "temp": ]] .. temp .. [[, 
-        "humidity": ]] .. humidity .. [[
-        } ]]
-   mqttSend(jsonMsg) 
+function sendResult(temp, humidity)
+    print(string.format("Temp: %2.1fC, humidity %2.1f%%",
+        temp, humidity))
+    jsonMsg = [[ {"temp": ]] .. temp .. 
+        [[, "humidity": ]] .. humidity .. [[}\r\n ]]
+    httpSend(jsonMsg);
 end
 
 
@@ -78,6 +64,7 @@ function readSensor()
 
     if (status ~= dht.ERROR_TIMEOUT) then
         sendResult(temp, humidity)    
+
     end
 end
 
