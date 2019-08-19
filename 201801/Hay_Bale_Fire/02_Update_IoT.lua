@@ -17,18 +17,18 @@ iotPlatformCred = {
     authToken = <<redacted>>
 }
 
+
 hostname = string.format("%s.messaging.internetofthings.ibmcloud.com",
     iotPlatformCred.orgID)
 
-url = string.format("https://%s/api/v0002/device/types/%s/devices/%d/events/sensorReading",
-    hostname, iotPlatformCred.devType, iotPlatformCred.devID)
+url = string.format("https://%s:8883/api/v0002/device/types/%s/devices/%d/events/sensorReading",
+   hostname, iotPlatformCred.devType, iotPlatformCred.devID)
 
 httpHeaders = 
     "Content-Type: application/json\r\n" .. 
     "Authorization: Basic " ..
         encoder.toBase64(iotPlatformCred.authMethod .. ":" ..
-                         iotPlatformCred.authToken) ..
-    "\r\n"
+                         iotPlatformCred.authToken) .. "\r\n"
 
 
 -- Actually connect
@@ -53,8 +53,10 @@ end
 function sendResult(temp, humidity)
     print(string.format("Temp: %2.1fC, humidity %2.1f%%",
         temp, humidity))
-    jsonMsg = [[ {"temp": ]] .. temp .. 
-        [[, "humidity": ]] .. humidity .. [[}\r\n ]]
+    jsonMsg = [[{"temp": ]] .. temp .. 
+        [[, "humidity": ]] .. humidity .. [[}
+        
+        ]]
     httpSend(jsonMsg);
 end
 
