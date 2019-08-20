@@ -40,7 +40,6 @@ wifi.sta.config({
 
 
 function httpSend(jsonMsg) 
-    print(jsonMsg)
     http.post(url, httpHeaders, jsonMsg, 
         function(code, data)
             print(code, data)
