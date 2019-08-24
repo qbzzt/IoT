@@ -15,7 +15,7 @@ const char* authToken = "<<redacted>>";   // Use the same token for all the devi
 const String hostname = orgID + ".messaging.internetofthings.ibmcloud.com";
 
 // The URL is a format string because the sensor's chip ID varies
-const String urlFormatString = "http://" + hostname + ":1883/api/v0002/device/types/Hay-Sensor/devices/%d/events/sensorReading";
+const String urlFormatString = "https://" + hostname + ":8883/api/v0002/device/types/Hay-Sensor/devices/%d/events/sensorReading";
 
 
 const int maxPacketLength = 255;
