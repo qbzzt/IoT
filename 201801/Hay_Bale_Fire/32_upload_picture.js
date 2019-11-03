@@ -4,7 +4,7 @@ const serviceAcctCred = {
 };
 
 // The endpoint for the US, yours might be different
-const storageEndpoint = "s3-api.us-geo.objectstorage.softlayer.net";
+const storageEndpoint = "s3.dal.us.cloud-object-storage.appdomain.cloud";
 
 
 const fname = "/tmp/test.png";
